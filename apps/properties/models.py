@@ -1,6 +1,3 @@
-from email.policy import default
-from turtle import title
-from xmlrpc.client import Boolean
 from django.db import models
 import random 
 import string
