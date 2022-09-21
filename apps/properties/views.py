@@ -1,7 +1,6 @@
 import logging
 
 import django_filters
-from django.db.models import query
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, generics, permissions, status
 from rest_framework.decorators import api_view, permission_classes
@@ -19,36 +18,36 @@ logger = logging.getLogger(__name__)
 # Create your views here.
 class PropertyFilter(django_filters.FilterSet):
     advert_type = django_filters.CharFilter(
-        field_name = "advert_type", lookup_expr = "iexact"
+        field_name="advert_type", lookup_expr="iexact"
     )
 
     property_type = django_filters.CharFilter(
-        field_name= "property_type", lookup_expr= "iexact"
+        field_name="property_type", lookup_expr="iexact"
     )
 
     price = django_filters.NumberFilter()
-    price_gt = django_filters.NumberFilter(field_name="price", 
-    lookup_expr="gt")
-    price_lt = django_filters.NumberFilter(field_name="price",
-    lookup_expr="lt")
+    price_gt = django_filters.NumberFilter(field_name="price", lookup_expr="gt")
+    price_lt = django_filters.NumberFilter(field_name="price", lookup_expr="lt")
 
     class Meta:
         model = Property
         fields = ["advert_type", "property_type", "price"]
+
 
 class ListAllPropertiesAPIView(generics.ListAPIView):
     serializer_class = PropertySerializer
     queryset = Property.objects.all().order_by("-created_at")
     pagination_class = PropertyPagination
     filter_backends = [
-        DjangoFilterBackend, 
-        filters.SearchFilter, 
-        filters.OrderingFilter
+        DjangoFilterBackend,
+        filters.SearchFilter,
+        filters.OrderingFilter,
     ]
 
     filterset_class = PropertyFilter
     search_fields = ["country", "city"]
     ordering_fields = ["created_at"]
+
 
 class ListAgentsPropertiesAPIView(generics.ListAPIView):
     serializer_class = PropertySerializer
@@ -56,7 +55,7 @@ class ListAgentsPropertiesAPIView(generics.ListAPIView):
     filter_backends = [
         DjangoFilterBackend,
         filters.SearchFilter,
-        filters.OrderingFilter
+        filters.OrderingFilter,
     ]
 
     filterset_class = PropertyFilter
@@ -68,9 +67,11 @@ class ListAgentsPropertiesAPIView(generics.ListAPIView):
         queryset = Property.objects.filter(user=user).order_by("-created_at")
         return queryset
 
+
 class PropertyViewAPIView(generics.ListAPIView):
     serializer_class = PropertyViewSerializer
     queryset = PropertyViews.objects.all()
+
 
 class PropertyDetailView(APIView):
     def get(self, request, slug):
@@ -92,7 +93,8 @@ class PropertyDetailView(APIView):
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-# function based view example  
+
+# function based view example
 @api_view(["PUT"])
 @permission_classes([permissions.IsAuthenticated])
 def update_property_api_view(request, slug):
@@ -102,7 +104,7 @@ def update_property_api_view(request, slug):
         raise PropertyNotFound
 
     user = request.user
-    if property.user != user :
+    if property.user != user:
         return Response(
             {"error": "you can't update or edit a property that doesn't belong to you"},
             status=status.HTTP_403_FORBIDDEN,
@@ -113,6 +115,7 @@ def update_property_api_view(request, slug):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data)
+
 
 # Function for POST
 @api_view(["POST"])
@@ -130,7 +133,8 @@ def create_property_api_view(request):
         return Response(serializer.data)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-# Delete function 
+
+# Delete function
 @api_view(["DELETE"])
 @permission_classes([permissions.IsAuthenticated])
 def delete_property_api_view(request, slug):
@@ -140,19 +144,20 @@ def delete_property_api_view(request, slug):
         raise PropertyNotFound
 
     user = request.user
-    if property.user != user :
+    if property.user != user:
         return Response(
             {"error": "you can't delete a property that doesn't belong to you"},
             status=status.HTTP_403_FORBIDDEN,
         )
     if request.method == "DELETE":
-        delete_operation = property.delete() 
+        delete_operation = property.delete()
         data = {}
         if delete_operation:
             data["success"] = "Deletion was Successful"
         else:
             data["failure"] = "Deletion failed"
         return Response(data=data)
+
 
 @api_view(["POST"])
 @permission_classes([permissions.IsAuthenticated])
@@ -166,7 +171,8 @@ def uploadPropertyImage(request):
     property.photo3 = request.FILES.get("photo3")
     property.photo4 = request.FILES.get("photo4")
     property.save()
-    return Response("Image(s) uploaded") 
+    return Response("Image(s) uploaded")
+
 
 class PropertySearchAPIView(APIView):
     permission_classes = [permissions.AllowAny]
@@ -197,7 +203,7 @@ class PropertySearchAPIView(APIView):
             price = 600000
         elif price == "Any":
             price = -1
-        
+
         if price != -1:
             queryset = queryset.filter(price__gte=price)
 
@@ -223,21 +229,16 @@ class PropertySearchAPIView(APIView):
         elif bathrooms == "1+":
             bathrooms = 1.0
         elif bathrooms == "2+":
-            bathrooms = 2.0 
+            bathrooms = 2.0
         elif bathrooms == "3+":
             bathrooms = 3.0
         elif bathrooms == "4+":
             bathrooms = 4.0
 
         queryset = queryset.filter(bathrooms__gte=bathrooms)
-        catch_phrase = data=["catch_phrase"]
+        catch_phrase = data = ["catch_phrase"]
         queryset = queryset.filter(description__icontains=catch_phrase)
 
         serializer = PropertySerializer(queryset, many=True)
 
         return Response(serializer.data)
-
-
-
-
-        

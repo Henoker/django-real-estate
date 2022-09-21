@@ -1,12 +1,12 @@
-from email import message
-from django.shortcuts import render
 from django.core.mail import send_mail
-from real_estate.settings.development import DEFAULT_FROM_EMAIL
 from rest_framework import permissions
-from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
+from rest_framework.response import Response
+
+from real_estate.settings.development import DEFAULT_FROM_EMAIL
 
 from .models import Enquiry
+
 
 # Create your views here.
 @api_view(["POST"])
@@ -29,4 +29,3 @@ def send_enquiry_email(request):
         return Response({"success": "Your Enquiry is submitted successfuly"})
     except:
         return Response({"Fail": "Enquiry was not sent> Please try again"})
-        
