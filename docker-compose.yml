@@ -5,11 +5,14 @@ services:
         build:
             context: .
             dockerfile: ./docker/local/django/Dockerfile
+        ports:
+            - "8000:8000"
         command: /start
+        
         volumes:
-            - .:/app
-            - static_volume:/app/staticfiles
-            - media_volume:/app/mediafiles
+           - .:/app
+           - ./staticfiles:/app/staticfiles
+           - ./mediafiles:/app/mediafiles
         expose:
             - "8000"
         env_file:
@@ -25,7 +28,7 @@ services:
         ports:
             - "5432:5432"
         volumes:
-            - postgres_data:/var/lib/postgresql/data/
+            - ./data/postgres_data:/var/lib/postgresql/data/
         environment:
             - POSTGRES_USER=${POSTGRES_USER}
             - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
