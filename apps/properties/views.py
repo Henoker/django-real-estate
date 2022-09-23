@@ -15,7 +15,7 @@ from .serializers import (PropertyCreateSerializer, PropertySerializer,
 
 logger = logging.getLogger(__name__)
 
-# Create your views here.
+
 class PropertyFilter(django_filters.FilterSet):
     advert_type = django_filters.CharFilter(
         field_name="advert_type", lookup_expr="iexact"

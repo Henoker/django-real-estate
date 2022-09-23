@@ -28,4 +28,4 @@ def send_enquiry_email(request):
 
         return Response({"success": "Your Enquiry is submitted successfuly"})
     except:
-        return Response({"Fail": "Enquiry was not sent> Please try again"})
+        return Response({"Fail": "Enquiry was not sent. Please try again"})
