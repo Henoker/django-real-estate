@@ -8,7 +8,6 @@ from real_estate.settings.development import DEFAULT_FROM_EMAIL
 from .models import Enquiry
 
 
-# Create your views here.
 @api_view(["POST"])
 @permission_classes([permissions.AllowAny])
 def send_enquiry_email(request):
@@ -19,13 +18,15 @@ def send_enquiry_email(request):
         name = data["name"]
         email = data["email"]
         message = data["message"]
-        from_email = data["from"]
+        from_email = data["email"]
         recipient_list = [DEFAULT_FROM_EMAIL]
 
         send_mail(subject, message, from_email, recipient_list, fail_silently=True)
+
         enquiry = Enquiry(name=name, email=email, subject=subject, message=message)
         enquiry.save()
 
-        return Response({"success": "Your Enquiry is submitted successfuly"})
+        return Response({"success": "Your Enquiry was successfully submitted"})
+
     except:
-        return Response({"Fail": "Enquiry was not sent. Please try again"})
+        return Response({"fail": "Enquiry was not sent. Please try again"})
